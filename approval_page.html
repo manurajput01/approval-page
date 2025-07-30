@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cleaning Service Approval</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 40px; text-align: center; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 700px; margin: auto; }
+        .option-box { display: inline-block; width: 45%; padding: 20px; margin: 10px; border: 1px solid #ccc; border-radius: 10px; vertical-align: top; }
+        button { padding: 10px 20px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Choose Your Cleaning Service</h2>
+    <p>Please select one of the following options for your property treatment:</p>
+    <div class="option-box">
+        <h3>🧹 Standard Cleaning</h3>
+        <p>✔ Quick mould removal<br>✔ Budget-friendly<br>✔ Fast turnaround</p>
+        <button onclick="submitChoice('standard')">Approve Option 1</button>
+    </div>
+    <div class="option-box">
+        <h3>🧼 Advanced Cleaning</h3>
+        <p>✔ Full surface treatment<br>✔ Anti-fungal protection<br>✔ Long-term results</p>
+        <button onclick="submitChoice('advanced')">Approve Option 2</button>
+    </div>
+    <p id="result"></p>
+</div>
+
+<script>
+    async function submitChoice(option) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const oppId = urlParams.get("oppid");
+        const resultElement = document.getElementById("result");
+
+        let flowUrl = "";
+        if (option === 'standard') {
+            flowUrl = "https://65e3f9489302e82e9b43a0c712dcd6.d2.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0fbce72333424fa289d845e38ef51a08/triggers/manual/paths/invoke/?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ktf49fi4F5xf-PFeLAq2S2oe7dilpwZ2E_cF4t5_Hcs";
+        } else if (option === 'advanced') {
+            flowUrl = "https://65e3f9489302e82e9b43a0c712dcd6.d2.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/3a6c38a7148e405c9d567170f1defb38/triggers/manual/paths/invoke/?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ah2jEGIzre7RoJaiFMLBD_WlB4UuqRb9M59YbIwPvDs";
+        }
+
+        try {
+            const response = await fetch(flowUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ opportunityid: oppId, selectedOption: option })
+            });
+            if (response.ok) {
+                resultElement.innerHTML = "<span class='success'>✅ Your approval has been submitted successfully!</span>";
+            } else {
+                resultElement.innerHTML = "<span class='error'>❌ Something went wrong. Please try again later.</span>";
+            }
+        } catch (error) {
+            resultElement.innerHTML = "<span class='error'>❌ Network error. Please check your internet connection.</span>";
+        }
+    }
+</script>
+</body>
+</html>
